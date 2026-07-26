@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 from enum import StrEnum
 from pathlib import Path
 
@@ -44,26 +45,45 @@ def deserialize(
     return data
 
 
-def load_data(data: dict[str, JsonValue]) -> list[Object]:
+def load_data(data: dict[str, JsonValue], l10n: str) -> list[Object]:
     objects = []
     group = next(iter(data))
     for properties in data[group]:
-        objects.append(Object(group, properties))
+        objects.append(Object(group, l10n, properties))
     return objects
 
 
 def load_file(
-    file: Path, action: DeserializeAction = DeserializeAction.IMPLICITLY_FIX
+    file: Path,
+    action: DeserializeAction = DeserializeAction.IMPLICITLY_FIX,
+    l10n: str = None,
 ) -> list[Object]:
     data = deserialize(file, action)
-    return load_data(data)
+    if l10n is not None:
+        return load_data(data, l10n)
+
+    path_str = file.as_posix()
+    l10ns = re.findall("loc_(.*?)/", path_str)
+    if len(l10ns) == 1:
+        l10n = l10ns[0]
+        print(
+            f'[WARN] "{file}" is inferred to be a localization file for {l10n}. Call with l10n=<language code> to fix or supress this warning.'
+        )
+    else:
+        l10n = "en-GB"
+        print(
+            f'[WARN] Unable to infer if "{file}" is a localization file or not. Assume it is not a localization file ("en-GB"). Call with l10n=<language code> to fix or supress this warning.'
+        )
+    return load_data(data, l10n)
 
 
 def load_dir(
-    directory: Path, action: DeserializeAction = DeserializeAction.IMPLICITLY_FIX
+    directory: Path,
+    action: DeserializeAction = DeserializeAction.IMPLICITLY_FIX,
+    l10n: str = None,
 ) -> list[Object]:
     objects = []
     files = [p for p in directory.rglob("*.json") if p.is_file()]
     for file in files:
-        objects += load_file(file, action)
+        objects += load_file(file, action, l10n)
     return objects
