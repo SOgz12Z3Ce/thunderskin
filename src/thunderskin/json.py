@@ -3,10 +3,10 @@ import json
 from enum import StrEnum
 from pathlib import Path
 
-from thunderskin.types import JsonValue
 from thunderskin.constants import FILEHASH_PATTERN_DICT, PATTERN_REPLACEMENT_DICT
 from thunderskin.exceptions import UnreachableError
 from thunderskin.object import Object
+from thunderskin.types import JsonValue
 
 
 class DeserializeAction(StrEnum):
