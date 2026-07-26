@@ -21,9 +21,7 @@ Issues = "https://github.com/SOgz12Z3Ce/thunderskin/issues"
 thunderskin = "thunderskin:main"
 
 [dependency-groups]
-dev = [
-  "twine>=6.2.0",
-]
+dev = ["ruff>=0.16.0", "twine>=6.2.0"]
 
 [build-system]
 requires = ["uv_build>=0.11.28,<0.12.0"]
