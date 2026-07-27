@@ -5,7 +5,7 @@ from enum import StrEnum
 from pathlib import Path
 
 from thunderskin.constants import FILEHASH_PATTERN_DICT, PATTERN_REPLACEMENT_DICT
-from thunderskin.exceptions import UnreachableError, BadParameterError
+from thunderskin.exceptions import BadParameterError, UnreachableError
 from thunderskin.object import Object
 from thunderskin.types import JsonValue
 
@@ -22,17 +22,17 @@ def deserialize(
     """Deserialize a json file and try to fix errors."""
     try:
         data = json.loads(Path(file).read_text(encoding="utf-8-sig"))
-    except json.JSONDecodeError as e:
+    except json.JSONDecodeError:
         if action == DeserializeAction.DONTFIX:
             # print(file)
-            raise e
+            raise
         if (
             action == DeserializeAction.IMPLICITLY_FIX
             or action == DeserializeAction.FIX
         ):
             file_hash = hashlib.sha256(file.read_bytes()).hexdigest()
             if file_hash not in FILEHASH_PATTERN_DICT:
-                raise e
+                raise
             content = file.read_text(encoding="utf-8-sig")
             for pattern in FILEHASH_PATTERN_DICT[file_hash]:
                 content = content.replace(pattern, PATTERN_REPLACEMENT_DICT[pattern])
@@ -57,7 +57,7 @@ def load_data(data: dict[str, JsonValue], l10n: str) -> list[Object]:
 def load_file(
     file: Path,
     action: DeserializeAction = DeserializeAction.IMPLICITLY_FIX,
-    l10n: str = None,
+    l10n: str | None = None,
 ) -> list[Object]:
     data = deserialize(file, action)
     if l10n is not None:
@@ -81,7 +81,7 @@ def load_file(
 def load_dir(
     directory: Path,
     action: DeserializeAction = DeserializeAction.IMPLICITLY_FIX,
-    l10n: str = None,
+    l10n: str | None = None,
 ) -> list[Object]:
     objects = []
     files = [p for p in directory.rglob("*.json") if p.is_file()]
