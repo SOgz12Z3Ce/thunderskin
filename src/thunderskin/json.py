@@ -5,7 +5,7 @@ from enum import StrEnum
 from pathlib import Path
 
 from thunderskin.constants import FILEHASH_PATTERN_DICT, PATTERN_REPLACEMENT_DICT
-from thunderskin.exceptions import UnreachableError
+from thunderskin.exceptions import UnreachableError, BadParameterError
 from thunderskin.object import Object
 from thunderskin.types import JsonValue
 
@@ -24,6 +24,7 @@ def deserialize(
         data = json.loads(Path(file).read_text(encoding="utf-8-sig"))
     except json.JSONDecodeError as e:
         if action == DeserializeAction.DONTFIX:
+            # print(file)
             raise e
         if (
             action == DeserializeAction.IMPLICITLY_FIX
@@ -70,9 +71,9 @@ def load_file(
             f'[WARN] "{file}" is inferred to be a localization file for {l10n}. Call with l10n=<language code> to fix or supress this warning.'
         )
     else:
-        l10n = "en-GB"
+        l10n = "en"
         print(
-            f'[WARN] Unable to infer if "{file}" is a localization file or not. Assume it is not a localization file ("en-GB"). Call with l10n=<language code> to fix or supress this warning.'
+            f'[WARN] Unable to infer if "{file}" is a localization file or not. Assume it is not a localization file ("en"). Call with l10n=<language code> to fix or supress this warning.'
         )
     return load_data(data, l10n)
 
@@ -86,4 +87,45 @@ def load_dir(
     files = [p for p in directory.rglob("*.json") if p.is_file()]
     for file in files:
         objects += load_file(file, action, l10n)
+    return objects
+
+
+def load_core(directory: Path) -> list[Object]:
+    objects = []
+    for subdir in [p for p in directory.iterdir() if p.is_dir()]:
+        l10n = ""
+        match subdir.name:
+            case "core":
+                l10n = "en"
+            case "loc_de":
+                l10n = "de"
+            case "loc_es":
+                l10n = "es"
+            case "loc_fr":
+                l10n = "fr"
+            case "loc_jp":
+                l10n = "jp"
+            case "loc_ru":
+                l10n = "ru"
+            case "loc_zh-hans":
+                l10n = "zh-hans"
+            case _:
+                raise BadParameterError
+        objects += load_dir(subdir, DeserializeAction.FIX, l10n)
+    return objects
+
+
+def load_mod(directory: Path) -> list[Object]:
+    objects = []
+    for subdir in [p for p in directory.iterdir() if p.is_dir()]:
+            match subdir.name:
+                case "content":
+                    objects += load_dir(subdir, DeserializeAction.DONTFIX, "en")
+                case "loc":
+                    for locdir in [p for p in subdir.iterdir() if p.is_dir()]:
+                        match = re.search("loc_(.*)", locdir.as_posix())
+                        if match is None:
+                            continue
+                        l10n = match.group(0)
+                        objects += load_dir(locdir, DeserializeAction.DONTFIX, l10n)
     return objects
