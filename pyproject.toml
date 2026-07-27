@@ -3,10 +3,10 @@ name = "thunderskin"
 version = "0.3.0"
 description = "Process JSON data of Cultist Simulator."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
-authors = [{ name = "SOgz12Z3Ce", email = "SOgz12Z3Ce@proton.me" }]
+authors = [{ name = "SOgz12Z3Ce", email = "sogz12z3ce@proton.me" }]
 classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
@@ -21,8 +21,10 @@ Issues = "https://github.com/SOgz12Z3Ce/thunderskin/issues"
 thunderskin = "thunderskin:main"
 
 [dependency-groups]
-dev = ["ruff>=0.16.0", "twine>=6.2.0"]
+dev = [
+  "ruff>=0.16.0",
+]
 
 [build-system]
-requires = ["uv_build>=0.11.28,<0.12.0"]
+requires = ["uv_build>=0.11.32,<0.12.0"]
 build-backend = "uv_build"
