@@ -11,7 +11,9 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
 ]
-dependencies = []
+dependencies = [
+  "rich>=15.0.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/SOgz12Z3Ce/thunderskin"
@@ -29,3 +31,10 @@ dev = [
 [build-system]
 requires = ["uv_build>=0.11.32,<0.12.0"]
 build-backend = "uv_build"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "D203",
+  "D213",
+]
