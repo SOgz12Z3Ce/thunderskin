@@ -5,7 +5,7 @@ from enum import StrEnum
 from pathlib import Path
 
 from thunderskin.constants import FILEHASH_PATTERN_DICT, PATTERN_REPLACEMENT_DICT
-from thunderskin.exceptions import BadParameterError, UnreachableError
+from thunderskin.exceptions import UnreachableError
 from thunderskin.object import Object
 from thunderskin.types import JsonValue
 
@@ -109,8 +109,6 @@ def load_core(directory: Path) -> list[Object]:
                 l10n = "ru"
             case "loc_zh-hans":
                 l10n = "zh-hans"
-            case _:
-                raise BadParameterError
         objects += load_dir(subdir, DeserializeAction.FIX, l10n)
     return objects
 
