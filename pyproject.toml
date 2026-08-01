@@ -23,6 +23,7 @@ thunderskin = "thunderskin:main"
 [dependency-groups]
 dev = [
   "ruff>=0.16.0",
+  "ty>=0.0.65",
 ]
 
 [build-system]
