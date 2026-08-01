@@ -1,4 +1,4 @@
-from thunderskin.types import JsonValue
+from thunderskin.json.types import JsonValue
 
 
 def localize_str(target: str, reference: str) -> str:

@@ -4,10 +4,10 @@ import re
 from enum import StrEnum
 from pathlib import Path
 
-from thunderskin.constants import FILEHASH_PATTERN_DICT, PATTERN_REPLACEMENT_DICT
+from thunderskin.json.patterns import FILEHASH_PATTERN_DICT, PATTERN_REPLACEMENT_DICT
 from thunderskin.exceptions import UnreachableError
 from thunderskin.object import Object
-from thunderskin.types import JsonValue
+from thunderskin.json.types import JsonValue
 
 
 class DeserializeAction(StrEnum):
@@ -113,17 +113,17 @@ def load_core(directory: Path) -> list[Object]:
     return objects
 
 
-def load_mod(directory: Path) -> list[Object]:
-    objects = []
-    for subdir in [p for p in directory.iterdir() if p.is_dir()]:
-            match subdir.name:
-                case "content":
-                    objects += load_dir(subdir, DeserializeAction.DONTFIX, "en")
-                case "loc":
-                    for locdir in [p for p in subdir.iterdir() if p.is_dir()]:
-                        match = re.search("loc_(.*)", locdir.as_posix())
-                        if match is None:
-                            continue
-                        l10n = match.group(0)
-                        objects += load_dir(locdir, DeserializeAction.DONTFIX, l10n)
-    return objects
+# def load_mod(directory: Path) -> list[Object]:
+#     objects = []
+#     for subdir in [p for p in directory.iterdir() if p.is_dir()]:
+#         match subdir.name:
+#             case "content":
+#                 objects += load_dir(subdir, DeserializeAction.DONTFIX, "en")
+#             case "loc":
+#                 for locdir in [p for p in subdir.iterdir() if p.is_dir()]:
+#                     match = re.search("loc_(.*)", locdir.as_posix())
+#                     if match is None:
+#                         continue
+#                     l10n = match.group(0)
+#                     objects += load_dir(locdir, DeserializeAction.DONTFIX, l10n)
+#     return objects
