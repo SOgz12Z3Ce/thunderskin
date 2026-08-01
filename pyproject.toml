@@ -34,7 +34,4 @@ build-backend = "uv_build"
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = [
-  "D203",
-  "D213",
-]
+ignore = ["D203", "D213", "COM812"]
