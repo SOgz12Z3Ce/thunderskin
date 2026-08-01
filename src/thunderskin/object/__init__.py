@@ -36,7 +36,7 @@ class Object:
     """
 
     def __init__(self, group: str, l10n: str, properties: JsonObject) -> None:
-        """Initialize Object.
+        """Initialize `Object`.
 
         Args:
             group: Object type (the root key). It can be:
