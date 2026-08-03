@@ -45,3 +45,6 @@ Attributes:
 
 class UnreachableError(Exception):
     """Raised when unreachable code is executed."""
+
+class ConflictObjectsError(Exception):
+    """Raised when two confilict `Object`s are loaded."""

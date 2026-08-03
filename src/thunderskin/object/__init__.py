@@ -59,3 +59,18 @@ class Object:
         self.group = group
         self.l10n = l10n
         self.properties = properties
+
+    def __eq__(self, other):
+        if not isinstance(other, Object):
+            return NotImplemented
+        return (
+            self.group == other.group
+            and self.l10n == other.l10n
+            and self.properties == other.properties
+        )
+
+    def id(self):
+        return self.properties["id"]
+
+    def unique_id(self):
+        return f"{self.group}/{self.id()}"

@@ -24,7 +24,7 @@
 
 This package exposes some functions to load JSON files as `Object`s.
 
-functions beginning with "load" return one or more `Object`s.s
+functions beginning with "load" return one or more `Object`s. But `load_core` returns `L10nObject`s.
 
 Attributes:
     DeserializeAction: A enum class to control fixing game origin JSON files behaviour.
@@ -32,7 +32,7 @@ Attributes:
     load_data: Load `Object` from JSON deserialization data.
     load_file: Load `Object`s from a JSON file.
     load_dir: Load `Object`s from all JSON files in a directory.
-    load_core: Load `Object`s from original game JSON files. `directory` is the content
+    load_core: Load `L10nObject`s from original game JSON files. `directory` is the content.
     directory.
 
 """
@@ -44,9 +44,10 @@ import warnings
 from enum import StrEnum
 from pathlib import Path
 
-from thunderskin.exceptions import UnreachableError
+from thunderskin.exceptions import ConflictObjectsError, UnreachableError
 from thunderskin.json.patterns import FILEHASH_PATTERN_DICT, PATTERN_REPLACEMENT_DICT
 from thunderskin.json.types import JsonValue
+from thunderskin.l10n import L10nObject
 from thunderskin.object import Object
 
 
@@ -142,9 +143,9 @@ def load_dir(
     return objects
 
 
-def load_core(directory: Path) -> list[Object]:
+def load_core(directory: Path) -> list[L10nObject]:
     """Load original game JSON files."""
-    objects = []
+    unique_id_objects_map = {}
     for subdir in [p for p in directory.iterdir() if p.is_dir()]:
         l10n = ""
         match subdir.name:
@@ -162,5 +163,22 @@ def load_core(directory: Path) -> list[Object]:
                 l10n = "ru"
             case "loc_zh-hans":
                 l10n = "zh-hans"
-        objects += load_dir(subdir, DeserializeAction.FIX, l10n)
-    return objects
+        cur_objects = load_dir(subdir, DeserializeAction.FIX, l10n)
+        unique_id_object_map = {}
+        for obj in cur_objects:
+            unique_id = obj.unique_id()
+            if unique_id in unique_id_object_map:
+                if unique_id_object_map[unique_id] != obj:
+                    raise ConflictObjectsError
+                continue
+            unique_id_object_map[unique_id] = obj
+        for unique_id, obj in unique_id_object_map.items():
+            if unique_id not in unique_id_objects_map:
+                unique_id_objects_map[unique_id] = []
+            unique_id_objects_map[unique_id].append(obj)
+
+    return [
+        L10nObject(objects)
+        for objects in unique_id_objects_map.values()
+        if any(obj.l10n == "en" for obj in objects)
+    ]

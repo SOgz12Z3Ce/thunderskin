@@ -54,14 +54,9 @@ class L10nObject:
 
     def as_l10n(self, l10n: str) -> Object:
         """Get a localized `Object`."""
-        core = self._core()
-        l10n_obj = self.l10n_properties_map[l10n]
-
-        return localize(
-            core.properties.copy(),
-            l10n_obj.properties,
-            L10N_REGISTRY[core.group],
-        )
+        core_wrapper = {self.group: self._core().copy()}
+        l10n_wrapper = {self.group: self.l10n_properties_map[l10n]}
+        return localize(core_wrapper, l10n_wrapper, L10N_REGISTRY)[self.group]
 
     def _core(self) -> Object:
         return self.l10n_properties_map["en"]

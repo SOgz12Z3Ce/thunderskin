@@ -95,12 +95,13 @@ def localize_slots(
     target_id_slot_map = {slot["id"]: slot for slot in target}
     reference_id_slot_map = {slot["id"]: slot for slot in reference}
     res = []
-    for key, value in target_id_slot_map.items():
-        if key not in reference_id_slot_map:
+    for slot in target:
+        slot_id = slot["id"]
+        if slot_id not in reference_id_slot_map:
+            res.append(slot)
             continue
-        target_slot = value
-        reference_slot = value
-        res.append(localize_slot(target_slot, reference_slot))
+        res.append(localize_slot(slot, reference_id_slot_map[slot_id]))
+    target[:] = res
     return res
 
 
