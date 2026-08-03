@@ -83,8 +83,8 @@ L10N_REGISTRY = {
         "internaldeck": localize_deck,
     },
     "verbs": {
-        "startlabel": localize_str,
         "label": localize_str,
+        "description": localize_str,
         "slot": localize_slot,
         "slots": localize_slots,
     },
