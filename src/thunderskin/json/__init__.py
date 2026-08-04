@@ -143,9 +143,9 @@ def load_dir(
     return objects
 
 
-def load_core(directory: Path) -> list[L10nObject]:
+def load_core(directory: Path) -> list[Object]:
     """Load original game JSON files."""
-    unique_id_objects_map = {}
+    objects = []
     for subdir in [p for p in directory.iterdir() if p.is_dir()]:
         l10n = ""
         match subdir.name:
@@ -164,21 +164,33 @@ def load_core(directory: Path) -> list[L10nObject]:
             case "loc_zh-hans":
                 l10n = "zh-hans"
         cur_objects = load_dir(subdir, DeserializeAction.FIX, l10n)
-        unique_id_object_map = {}
-        for obj in cur_objects:
-            unique_id = obj.unique_id()
-            if unique_id in unique_id_object_map:
-                if unique_id_object_map[unique_id] != obj:
-                    raise ConflictObjectsError
-                continue
-            unique_id_object_map[unique_id] = obj
-        for unique_id, obj in unique_id_object_map.items():
-            if unique_id not in unique_id_objects_map:
-                unique_id_objects_map[unique_id] = []
-            unique_id_objects_map[unique_id].append(obj)
+        objects += deduplicate(cur_objects)
+    return objects
 
-    return [
-        L10nObject(objects)
-        for objects in unique_id_objects_map.values()
-        if any(obj.l10n == "en" for obj in objects)
-    ]
+
+def load_mod(directory: Path) -> list[Object]:
+    objects = []
+    content = directory / "content"
+    objects += load_dir(content, DeserializeAction.DONTFIX, "en")
+    loc = directory / "loc"
+    if not loc.exists():
+        return objects
+    for subdir in [p for p in loc.iterdir() if p.is_dir()]:
+        name = subdir.name()
+        if not name.startswith("loc_"):
+            continue
+        l10n = name[4:]
+        objects += load_dir(subdir, DeserializeAction.DONTFIX, l10n)
+    return objects
+
+
+def deduplicate(objects: list[Object]) -> list[Object]:
+    unique_id_object_map = {}
+    for obj in objects:
+        unique_id = obj.unique_id()
+        if unique_id in unique_id_object_map:
+            if unique_id_object_map[unique_id] != obj:
+                raise ConflictObjectsError
+            continue
+        unique_id_object_map[unique_id] = obj
+    return [obj for obj in unique_id_object_map.values()]
