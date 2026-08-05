@@ -185,12 +185,12 @@ def load_mod(directory: Path) -> list[Object]:
 
 
 def deduplicate(objects: list[Object]) -> list[Object]:
-    unique_id_object_map = {}
+    symbol_object_map = {}
     for obj in objects:
-        unique_id = obj.unique_id()
-        if unique_id in unique_id_object_map:
-            if unique_id_object_map[unique_id] != obj:
+        symbol = obj.symbol()
+        if symbol in symbol_object_map:
+            if symbol_object_map[symbol] != obj:
                 raise ConflictObjectsError
             continue
-        unique_id_object_map[unique_id] = obj
-    return [obj for obj in unique_id_object_map.values()]
+        symbol_object_map[symbol] = obj
+    return [obj for obj in symbol_object_map.values()]

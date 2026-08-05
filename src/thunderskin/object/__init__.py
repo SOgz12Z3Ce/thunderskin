@@ -72,5 +72,5 @@ class Object:
     def id(self):
         return self.properties["id"]
 
-    def unique_id(self):
+    def symbol(self):
         return f"{self.group}/{self.id()}"

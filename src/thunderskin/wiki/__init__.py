@@ -4,4 +4,4 @@ from thunderskin.wiki.escape import escape
 
 
 def key(entry: Object | Resource) -> str:
-    return escape(entry.unique_id())
+    return escape(entry.symbol())

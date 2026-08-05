@@ -7,8 +7,8 @@ class Resource:
     def __init__(self, path: str, sha256: str):
         self.path = path
         self.sha256 = sha256
-    
-    def unique_id(self):
+
+    def symbol(self):
         return self.path
 
     def sha256(self):
