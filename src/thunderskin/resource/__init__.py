@@ -9,9 +9,9 @@ class Resource:
     def __init__(self, path: str, sha256: str):
         self.path = path
         self.sha256 = sha256
-
-    def key(self):
-        return escape(self.path)
+    
+    def unique_id(self):
+        return self.path
 
     def sha256(self):
         return self.sha256

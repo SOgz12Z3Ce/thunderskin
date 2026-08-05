@@ -75,6 +75,3 @@ class Object:
 
     def unique_id(self):
         return f"{self.group}/{self.id()}"
-
-    def key(self):
-        return escape(self.unique_id())
