@@ -1,8 +1,6 @@
 from pathlib import Path
 import hashlib
 
-from thunderskin.escape import escape
-
 
 # This class does not actually process resource content now.
 class Resource:

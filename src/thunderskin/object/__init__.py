@@ -26,7 +26,6 @@ This package exposes `Object` for managing files deserialization.
 """
 
 from thunderskin.json.types import JsonObject
-from thunderskin.escape import escape
 
 
 class Object:
