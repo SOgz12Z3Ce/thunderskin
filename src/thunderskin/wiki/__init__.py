@@ -23,7 +23,9 @@ def diff_list_to_lua(
             if isinstance(entry, Object):
                 if "label" in entry.properties:
                     diff_lua.append(f"['{entry.symbol()}'] = {{")
-                    diff_lua.append(f"label = '{entry.properties.get('label')}',")
+                    diff_lua.append(
+                        f"label = '{entry.properties.get('label').replace("'", "\\'")}',"
+                    )
                     if "icon" in entry.properties:
                         diff_lua.append(f"icon = '{entry.properties['icon']}',")
                     diff_lua.append("},")
