@@ -2,15 +2,42 @@ from thunderskin.object import Object
 from thunderskin.package import Package
 from thunderskin.resource import Resource
 from thunderskin.exceptions import UnreachableError
+from thunderskin.inline_aspect import InlineAspect
 
 
 def diff(old: Package, new: Package) -> dict[str, list[Object | Resource]]:
-    old_symbol_entry_map = {obj.symbol(): obj for obj in old.objects} | {
-        res.symbol(): res for res in old.resources
-    }
-    new_symbol_entry_map = {obj.symbol(): obj for obj in new.objects} | {
-        res.symbol(): res for res in new.resources
-    }
+    # Recipes can inline a aspect, it can be used without a declaration.
+    old_inline_aspects = set()
+    for obj in old.objects:
+        if obj.group != "recipes":
+            continue
+        if "aspects" in obj.properties:
+            for aspect_id in obj.properties["aspects"].keys():
+                old_inline_aspects.add(InlineAspect(aspect_id))
+    new_inline_aspects = set()
+    for obj in new.objects:
+        if obj.group != "recipes":
+            continue
+        if "aspects" in obj.properties:
+            for aspect_id in obj.properties["aspects"].keys():
+                new_inline_aspects.add(InlineAspect(aspect_id))
+
+    old_symbol_entry_map = (
+        {obj.symbol(): obj for obj in old.objects}
+        | {res.symbol(): res for res in old.resources}
+        | {
+            inline_aspect.symbol(): inline_aspect
+            for inline_aspect in old_inline_aspects
+        }
+    )
+    new_symbol_entry_map = (
+        {obj.symbol(): obj for obj in new.objects}
+        | {res.symbol(): res for res in new.resources}
+        | {
+            inline_aspect.symbol(): inline_aspect
+            for inline_aspect in new_inline_aspects
+        }
+    )
     old_symbols = set(old_symbol_entry_map.keys())
     new_symbols = set(new_symbol_entry_map.keys())
     deleted_symbols = old_symbols - new_symbols
